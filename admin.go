@@ -24,6 +24,11 @@ func NewAdmin() (admin *Admin) {
 }
 
 func (admin *Admin) Tell(ctx context.Context, message common.Message, reaction Reaction) (out string, err error) {
+	if reaction.Error != nil {
+		err = reaction.Error
+		return
+	}
+
 	out = reaction.Message
 
 	// Nothing to do

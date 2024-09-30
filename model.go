@@ -44,11 +44,6 @@ func (mod *Model) Tell(ctx context.Context, message common.Message) (answer comm
 		messages []common.Message
 	)
 
-	// fmt.Printf("talk: %v\n", message)
-	// defer func() {
-	// 	fmt.Printf("answer: %v\n", answer)
-	// }()
-
 	messages = append(messages, mod.prompt...)
 	messages = append(messages, mod.history...)
 	messages = append(messages, message)
