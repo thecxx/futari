@@ -34,7 +34,7 @@ func GetPrompt() (prompt string) {
 
 	prompts := make([]string, 0, len(cmds))
 	for _, cmd := range cmds {
-		prompts = append(prompts, fmt.Sprintf("%s\n%s", cmd.template, cmd.explain))
+		prompts = append(prompts, fmt.Sprintf("指令模板(指令不包含中括号)：%s\n指令描述：%s", cmd.template, cmd.explain))
 	}
 
 	return strings.Join(prompts, "\n\n")
