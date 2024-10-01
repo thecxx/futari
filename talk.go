@@ -81,7 +81,7 @@ func (tk *Talk) Hear(fn func(out string)) {
 func (tk *Talk) encodeMessage(user *RichMessage) (content string, err error) {
 	now := time.Now()
 	// Time
-	user.System.Time = now.String()
+	user.System.Time = now.Format(time.RFC3339)
 	user.System.Timestamp = now.Unix()
 
 	content = fmt.Sprintf(`<content>%s</content>
