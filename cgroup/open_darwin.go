@@ -1,4 +1,4 @@
-package command
+package cgroup
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func NewOpen(args []string) Command {
 // Do
 func (c *Open) Do() (err error) {
 	if c.application == "" {
-		return ErrInvalidInvailCommandArgs
+		return ErrInvalidCommandArgs
 	}
 	cmd := exec.Command("open", fmt.Sprintf("/Applications/%s.app", c.application))
 	return cmd.Start()

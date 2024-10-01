@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/thecxx/futari/common"
+	"github.com/thecxx/futari/define/types"
 )
 
 type Reaction struct {
-	Message string         `json:"message"`
-	System  System         `json:"system"`
-	Answer  common.Message `json:"-"`
-	Error   error          `json:"-"`
+	Message string        `json:"message"`
+	System  System        `json:"system"`
+	Answer  types.Message `json:"-"`
+	Error   error         `json:"-"`
 }
 
 type System struct {
@@ -30,7 +30,7 @@ func NewTalk(mod *Model, admin *Admin) (tk *Talk) {
 }
 
 // Tell
-func (tk *Talk) Tell(ctx context.Context, message common.Message) (out string, err error) {
+func (tk *Talk) Tell(ctx context.Context, message types.Message) (out string, err error) {
 	// Tell model
 	answer, err := tk.mod.Tell(ctx, message)
 	if err != nil {
@@ -53,4 +53,9 @@ func (tk *Talk) Tell(ctx context.Context, message common.Message) (out string, e
 // parseAnswer
 func (tk *Talk) parseAnswer(content string, reaction *Reaction) (err error) {
 	return json.Unmarshal([]byte(content), reaction)
+}
+
+// ToMessage
+func ToMessage(role, content string) types.Message {
+	return types.ToMessage(role, content)
 }

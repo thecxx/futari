@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/thecxx/futari/command"
-	"github.com/thecxx/futari/common"
+	"github.com/thecxx/futari/cgroup"
+	"github.com/thecxx/futari/define/types"
 )
 
 var (
@@ -23,7 +23,7 @@ func NewAdmin() (admin *Admin) {
 	return new(Admin)
 }
 
-func (admin *Admin) Tell(ctx context.Context, message common.Message, reaction Reaction) (out string, err error) {
+func (admin *Admin) Tell(ctx context.Context, message types.Message, reaction Reaction) (out string, err error) {
 	if reaction.Error != nil {
 		err = reaction.Error
 		return
@@ -45,7 +45,7 @@ func (admin *Admin) Tell(ctx context.Context, message common.Message, reaction R
 				args = strings.Split(submatch[2], " ")
 			}
 			// Query command creator
-			creator, ok := command.QueryCommand(name)
+			creator, ok := cgroup.QueryCommand(name)
 			if !ok {
 				return "", fmt.Errorf("command: %s not supported", name)
 			}

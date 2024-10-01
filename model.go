@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/thecxx/futari/common"
+	"github.com/thecxx/futari/define/types"
 )
 
 type Message struct {
@@ -23,25 +23,25 @@ func NewMessage(role, content string) Message {
 }
 
 type Engine interface {
-	SendMessages(ctx context.Context, messages []common.Message) (answer common.Message, err error)
+	SendMessages(ctx context.Context, messages []types.Message) (answer types.Message, err error)
 }
 
 // Model
 type Model struct {
 	engine  Engine
-	prompt  []common.Message
-	history []common.Message
+	prompt  []types.Message
+	history []types.Message
 }
 
 // NewModel
-func NewModel(engine Engine, prompt common.Message) (mod *Model) {
-	return &Model{engine: engine, prompt: []common.Message{prompt}, history: make([]common.Message, 0)}
+func NewModel(engine Engine, prompt types.Message) (mod *Model) {
+	return &Model{engine: engine, prompt: []types.Message{prompt}, history: make([]types.Message, 0)}
 }
 
 // Tell
-func (mod *Model) Tell(ctx context.Context, message common.Message) (answer common.Message, err error) {
+func (mod *Model) Tell(ctx context.Context, message types.Message) (answer types.Message, err error) {
 	var (
-		messages []common.Message
+		messages []types.Message
 	)
 
 	messages = append(messages, mod.prompt...)

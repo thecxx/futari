@@ -1,4 +1,4 @@
-package command
+package cgroup
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrInvalidInvailCommandArgs = errors.New("invalid command args")
+	ErrInvalidCommandArgs = errors.New("invalid command args")
 )
 
 type Command interface {

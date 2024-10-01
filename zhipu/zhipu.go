@@ -2,25 +2,46 @@ package zhipu
 
 import (
 	"context"
+	"net/http"
 
-	"github.com/thecxx/futari/common"
+	"github.com/thecxx/futari/define"
+	"github.com/thecxx/futari/define/types"
 	"github.com/yankeguo/zhipu"
 )
 
 const (
-	RoleSystem    = "system"
-	RoleAssistant = "assistant"
-	RoleUser      = "user"
-	Model         = "glm-4-0520"
+	ModelGLM_4_0520 = "glm-4-0520"
 )
+
+type ClientOption = zhipu.ClientOption
+
+// WithAPIKey set the api key of the client
+func WithAPIKey(apiKey string) ClientOption {
+	return zhipu.WithAPIKey(apiKey)
+}
+
+// WithBaseURL set the base url of the client
+func WithBaseURL(baseURL string) ClientOption {
+	return zhipu.WithBaseURL(baseURL)
+}
+
+// WithHTTPClient set the http client of the client
+func WithHTTPClient(client *http.Client) ClientOption {
+	return zhipu.WithHTTPClient(client)
+}
+
+// WithDebug set the debug mode of the client
+func WithDebug(debug bool) ClientOption {
+	return zhipu.WithDebug(debug)
+}
 
 type Zhipu struct {
 	model  string
 	client *zhipu.Client
 }
 
-func NewZhipu(model, apiKey string) (z *Zhipu, err error) {
-	client, err := zhipu.NewClient(zhipu.WithAPIKey(apiKey))
+func NewZhipu(model string, opts ...zhipu.ClientOption) (z *Zhipu, err error) {
+	client, err := zhipu.NewClient(opts...)
 	if err != nil {
 		return
 	}
@@ -29,7 +50,7 @@ func NewZhipu(model, apiKey string) (z *Zhipu, err error) {
 }
 
 // SendMessages implements futari.Model.
-func (z *Zhipu) SendMessages(ctx context.Context, messages []common.Message) (answer common.Message, err error) {
+func (z *Zhipu) SendMessages(ctx context.Context, messages []types.Message) (answer types.Message, err error) {
 	service := z.client.ChatCompletion(z.model)
 
 	for _, v := range messages {
@@ -41,5 +62,5 @@ func (z *Zhipu) SendMessages(ctx context.Context, messages []common.Message) (an
 		return answer, err
 	}
 
-	return common.ToMessage(RoleAssistant, resp.Choices[0].Message.Content), nil
+	return types.ToMessage(define.RoleAssistant, resp.Choices[0].Message.Content), nil
 }
