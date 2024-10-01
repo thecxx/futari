@@ -35,7 +35,7 @@ type Talk struct {
 
 // NewTalk
 func NewTalk(mod *Model, admin *Admin) (tk *Talk) {
-	return &Talk{mod: mod, admin: admin}
+	return &Talk{mod: mod, admin: admin, sayFn: func(string) {}}
 }
 
 // Tell
@@ -71,7 +71,9 @@ func (tk *Talk) Tell(ctx context.Context, in string) (out string, err error) {
 
 // Hear
 func (tk *Talk) Hear(fn func(out string)) {
-	tk.sayFn = fn
+	if fn != nil {
+		tk.sayFn = fn
+	}
 }
 
 // encodeMessage

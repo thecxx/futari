@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	regexpCmd = regexp.MustCompile(`#([^\s]+)\s+(.+)`)
+	regexpCmd = regexp.MustCompile(`^#([^\s]+)\s+(.+)$`)
 )
 
 // Admin
