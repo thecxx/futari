@@ -16,7 +16,7 @@ type Command interface {
 }
 
 type Creator struct {
-	New      func(args []string) Command
+	New      func(args []string, sayFn func(string)) Command
 	template string
 	explain  string
 }
@@ -41,14 +41,14 @@ func GetPrompt() (prompt string) {
 }
 
 // RegisterCommand
-func RegisterCommand(name string, newFn func(args []string) Command, template, explain string) {
+func RegisterCommand(name string, newFn func(args []string, sayFn func(string)) Command, template, explain string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	cmds[name] = Creator{New: newFn, template: template, explain: explain}
 }
 
 // QueryCommand
-func QueryCommand(name string) (newFn func(args []string) Command, supported bool) {
+func QueryCommand(name string) (newFn func(args []string, sayFn func(string)) Command, supported bool) {
 	mutex.RLock()
 	defer mutex.RUnlock()
 	cmd, supported := cmds[name]

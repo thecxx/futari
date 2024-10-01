@@ -17,11 +17,12 @@ type Open struct {
 	name        string
 	application string
 	args        []string
+	say         func(string)
 }
 
 // NewOpen
-func NewOpen(args []string) Command {
-	c := &Open{name: "启动器", args: args}
+func NewOpen(args []string, sayFn func(string)) Command {
+	c := &Open{name: "启动器", args: args, say: sayFn}
 	if len(args) >= 1 {
 		c.application = args[0]
 	}

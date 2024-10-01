@@ -29,6 +29,7 @@ type RichAnswer struct {
 type Talk struct {
 	mod   *Model
 	admin *Admin
+	sayFn func(string)
 }
 
 // NewTalk
@@ -38,10 +39,10 @@ func NewTalk(mod *Model, admin *Admin) (tk *Talk) {
 
 // Tell
 func (tk *Talk) Tell(ctx context.Context, in string) (out string, err error) {
-	req := &RichMessage{
+	user := &RichMessage{
 		Content: in,
 	}
-	content, err := tk.encodeMessage(req)
+	content, err := tk.encodeMessage(user)
 	if err != nil {
 		return "", err
 	}
@@ -54,25 +55,30 @@ func (tk *Talk) Tell(ctx context.Context, in string) (out string, err error) {
 		return "", err
 	}
 
-	resp := &RichAnswer{}
+	model := &RichAnswer{}
 
-	err = tk.decodeAnswer(answer.Content, resp)
+	err = tk.decodeAnswer(answer.Content, model)
 	if err != nil {
-		resp.Error = err
+		model.Error = err
 	}
-	resp.Answer = answer
+	model.Answer = answer
 
 	// Tell admin
-	out, err = tk.admin.Tell(ctx, req, resp)
+	out, err = tk.admin.Tell(ctx, user, model, tk.sayFn)
 	return
 }
 
-// encodeMessage
-func (tk *Talk) encodeMessage(req *RichMessage) (content string, err error) {
-	// Time
-	req.System.Time = time.Now().String()
+// Hear
+func (tk *Talk) Hear(fn func(out string)) {
+	tk.sayFn = fn
+}
 
-	tmp, err := json.Marshal(req)
+// encodeMessage
+func (tk *Talk) encodeMessage(user *RichMessage) (content string, err error) {
+	// Time
+	user.System.Time = time.Now().String()
+
+	tmp, err := json.Marshal(user)
 	if err != nil {
 		return "", err
 	}
@@ -81,8 +87,8 @@ func (tk *Talk) encodeMessage(req *RichMessage) (content string, err error) {
 }
 
 // decodeAnswer
-func (tk *Talk) decodeAnswer(content string, resp *RichAnswer) (err error) {
-	return json.Unmarshal([]byte(content), resp)
+func (tk *Talk) decodeAnswer(content string, model *RichAnswer) (err error) {
+	return json.Unmarshal([]byte(content), model)
 }
 
 // ToMessage

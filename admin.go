@@ -22,20 +22,20 @@ func NewAdmin() (admin *Admin) {
 	return new(Admin)
 }
 
-func (admin *Admin) Tell(ctx context.Context, req *RichMessage, resp *RichAnswer) (out string, err error) {
-	if resp.Error != nil {
-		err = resp.Error
+func (admin *Admin) Tell(ctx context.Context, user *RichMessage, model *RichAnswer, sayFn func(out string)) (out string, err error) {
+	if model.Error != nil {
+		err = model.Error
 		return
 	}
 
-	out = resp.Content
+	out = model.Content
 
 	// Nothing to do
-	if len(resp.System.Commands) <= 0 {
+	if len(model.System.Commands) <= 0 {
 		return
 	}
 
-	for _, cmd := range resp.System.Commands {
+	for _, cmd := range model.System.Commands {
 		submatch := regexpCmd.FindStringSubmatch(cmd)
 		if len(submatch) > 0 {
 			name := submatch[1]
@@ -43,15 +43,17 @@ func (admin *Admin) Tell(ctx context.Context, req *RichMessage, resp *RichAnswer
 			if len(submatch) > 2 {
 				args = strings.Split(submatch[2], " ")
 			}
-			// Query command creator
-			creator, ok := cgroup.QueryCommand(name)
+
+			// Query command
+			newCommand, ok := cgroup.QueryCommand(name)
 			if !ok {
 				return "", fmt.Errorf("command: %s not supported", name)
 			}
+
 			// Create command
-			executor := creator(args)
+			c := newCommand(args, sayFn)
 			// Execute command
-			if err = executor.Do(); err != nil {
+			if err = c.Do(); err != nil {
 				return "", err
 			}
 		}
