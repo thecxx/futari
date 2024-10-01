@@ -2,11 +2,15 @@ package zhipu
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
-	"github.com/thecxx/futari/define"
 	"github.com/thecxx/futari/define/types"
 	"github.com/yankeguo/zhipu"
+)
+
+var (
+	ErrInvalidChoices = errors.New("invalid choices")
 )
 
 const (
@@ -40,21 +44,25 @@ type Zhipu struct {
 	client *zhipu.Client
 }
 
-func NewZhipu(model string, opts ...zhipu.ClientOption) (z *Zhipu, err error) {
+func NewZhipu(model string, opts ...zhipu.ClientOption) (zp *Zhipu, err error) {
 	client, err := zhipu.NewClient(opts...)
 	if err != nil {
 		return
 	}
-	z = &Zhipu{model: model, client: client}
+	zp = &Zhipu{model: model, client: client}
 	return
 }
 
-// SendMessages implements futari.Model.
-func (z *Zhipu) SendMessages(ctx context.Context, messages []types.Message) (answer types.Message, err error) {
-	service := z.client.ChatCompletion(z.model)
+// Chat implements futari.Engine.
+func (zp *Zhipu) Chat(ctx context.Context, messages []types.Message) (answer types.Message, err error) {
+	service := zp.client.ChatCompletion(zp.model)
 
 	for _, v := range messages {
-		service = service.AddMessage(zhipu.ChatCompletionMessage{Role: v.Role, Content: v.Content})
+		message := zhipu.ChatCompletionMessage{
+			Role:    v.Role,
+			Content: v.Content,
+		}
+		service = service.AddMessage(message)
 	}
 
 	resp, err := service.Do(ctx)
@@ -62,5 +70,11 @@ func (z *Zhipu) SendMessages(ctx context.Context, messages []types.Message) (ans
 		return answer, err
 	}
 
-	return types.ToMessage(define.RoleAssistant, resp.Choices[0].Message.Content), nil
+	if len(resp.Choices) <= 0 {
+		return answer, ErrInvalidChoices
+	}
+
+	choice := resp.Choices[0]
+
+	return types.ToMessage(choice.Message.Role, choice.Message.Content), nil
 }
