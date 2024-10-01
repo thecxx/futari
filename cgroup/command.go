@@ -3,6 +3,7 @@ package cgroup
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -25,15 +26,18 @@ var (
 	mutex sync.RWMutex
 )
 
-// QueryPrompts
-func QueryPrompts() (prompts map[string]string) {
-	if len(cmds) > 0 {
-		prompts = make(map[string]string)
+// GetPrompt
+func GetPrompt() (prompt string) {
+	if len(cmds) <= 0 {
+		return
 	}
-	for name, cmd := range cmds {
-		prompts[name] = fmt.Sprintf("指令: %s\n%s", cmd.template, cmd.explain)
+
+	prompts := make([]string, 0, len(cmds))
+	for _, cmd := range cmds {
+		prompts = append(prompts, fmt.Sprintf("指令: %s\n%s", cmd.template, cmd.explain))
 	}
-	return
+
+	return strings.Join(prompts, "\n\n")
 }
 
 // RegisterCommand

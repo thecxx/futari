@@ -2,25 +2,9 @@ package futari
 
 import (
 	"context"
-	"sync/atomic"
 
 	"github.com/thecxx/futari/define/types"
 )
-
-type Message struct {
-	ID      uint64
-	Role    string
-	Content string
-}
-
-var (
-	messageID uint64
-)
-
-// NewMessage
-func NewMessage(role, content string) Message {
-	return Message{ID: atomic.AddUint64(&messageID, 1), Role: role, Content: content}
-}
 
 type Engine interface {
 	SendMessages(ctx context.Context, messages []types.Message) (answer types.Message, err error)

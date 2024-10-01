@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/thecxx/futari/cgroup"
-	"github.com/thecxx/futari/define/types"
 )
 
 var (
@@ -23,20 +22,20 @@ func NewAdmin() (admin *Admin) {
 	return new(Admin)
 }
 
-func (admin *Admin) Tell(ctx context.Context, message types.Message, reaction Reaction) (out string, err error) {
-	if reaction.Error != nil {
-		err = reaction.Error
+func (admin *Admin) Tell(ctx context.Context, req *RichMessage, resp *RichAnswer) (out string, err error) {
+	if resp.Error != nil {
+		err = resp.Error
 		return
 	}
 
-	out = reaction.Message
+	out = resp.Content
 
 	// Nothing to do
-	if len(reaction.System.Commands) <= 0 {
+	if len(resp.System.Commands) <= 0 {
 		return
 	}
 
-	for _, cmd := range reaction.System.Commands {
+	for _, cmd := range resp.System.Commands {
 		submatch := regexpCmd.FindStringSubmatch(cmd)
 		if len(submatch) > 0 {
 			name := submatch[1]
